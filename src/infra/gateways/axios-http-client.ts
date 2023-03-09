@@ -1,16 +1,23 @@
 import { HttpGetClient } from '@/domain/contracts/gateways';
-import axios, { AxiosResponse, AxiosError } from 'axios'
+import axios, { AxiosResponse, AxiosInstance } from 'axios'
 
 export class AxiosHttpClient implements HttpGetClient {
-  public async request(input: HttpGetClient.Input): Promise<HttpGetClient.Output> {
+
+  readonly axiosInstance: AxiosInstance
+
+  constructor(
+    private url: string,
+  ){
+    this.axiosInstance = axios.create({
+      url: this.url
+    })
+  }
+
+  public async get({ url, params }: HttpGetClient.Input): Promise<HttpGetClient.Output> {
     let axiosResponse: AxiosResponse
     try {
-      axiosResponse = await axios.request({
-        baseURL: input.baseURL,
-        url: input.url,
-        method: input.method,
-        data: input.body,
-        headers: input.headers
+      axiosResponse = await axios.get(url, {
+        params
       })
     } catch (error: any) {
       axiosResponse = error.response
