@@ -1,9 +1,8 @@
 import { ConnectionNotFoundError, TransactionNotFoundError } from '@/infra/repos/typeorm/helpers'
-import { DbTransaction } from '@/application/contracts'
 
 import { createConnection, getConnection, getConnectionManager, ObjectType, QueryRunner, Repository, Connection, getRepository, ObjectLiteral, Entity } from 'typeorm'
 
-export class ORMConnection implements DbTransaction {
+export class ORMConnection {
   private static instance?: ORMConnection
   private query?: QueryRunner
   private connection?: Connection
@@ -26,28 +25,6 @@ export class ORMConnection implements DbTransaction {
     await getConnection().close()
     this.query = undefined
     this.connection = undefined
-  }
-
-  async openTransaction (): Promise<void> {
-    if (this.connection === undefined) throw new ConnectionNotFoundError()
-    this.query = this.connection.createQueryRunner()
-    await this.query.startTransaction()
-  }
-
-  async closeTransaction (): Promise<void> {
-    if (this.query === undefined) throw new TransactionNotFoundError()
-    await this.query.release()
-    this.query = undefined
-  }
-
-  async commit (): Promise<void> {
-    if (this.query === undefined) throw new TransactionNotFoundError()
-    await this.query.commitTransaction()
-  }
-
-  async rollback (): Promise<void> {
-    if (this.query === undefined) throw new TransactionNotFoundError()
-    await this.query.rollbackTransaction()
   }
 
   getRepository<Entity extends ObjectLiteral> (entity: ObjectType<Entity>): Repository<Entity> {
