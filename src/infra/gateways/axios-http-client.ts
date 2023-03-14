@@ -9,22 +9,22 @@ export class AxiosHttpClient implements HttpGetClient {
     private url: string,
   ){
     this.axiosInstance = axios.create({
-      url: this.url
+      baseURL: this.url
     })
   }
 
   public async get({ url, params }: HttpGetClient.Input): Promise<HttpGetClient.Output> {
     let axiosResponse: AxiosResponse
     try {
-      axiosResponse = await axios.get(url, {
+      axiosResponse = await this.axiosInstance.get(url, {
         params
       })
     } catch (error: any) {
       axiosResponse = error.response
     }
     return {
-      statusCode: axiosResponse.status,
-      body: axiosResponse.data
+      statusCode: axiosResponse?.status,
+      body: axiosResponse?.data
     }
   }
 }

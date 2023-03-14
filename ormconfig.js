@@ -3,6 +3,7 @@ module.exports = [
     type: process.env.DATABASE_TYPE,
     url: process.env.DATABASE_URL,
     logging: process.env.NODE_ENV === 'development',
+    synchronize: process.env.NODE_ENV === 'development',
     useNewUrlParser: true,
     useUnifiedTopology: true,
     entities: [

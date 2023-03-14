@@ -1,6 +1,6 @@
-import { ConnectionNotFoundError, TransactionNotFoundError } from '@/infra/repos/typeorm/helpers'
+import { ConnectionNotFoundError } from '@/infra/repos/typeorm/helpers'
 
-import { createConnection, getConnection, getConnectionManager, ObjectType, QueryRunner, Repository, Connection, getRepository, ObjectLiteral, Entity } from 'typeorm'
+import { createConnection, getConnection, getConnectionManager, ObjectType, QueryRunner, Repository, Connection, getRepository, ObjectLiteral, getMongoRepository, MongoRepository } from 'typeorm'
 
 export class ORMConnection {
   private static instance?: ORMConnection
@@ -31,5 +31,11 @@ export class ORMConnection {
     if (this.connection === undefined) throw new ConnectionNotFoundError()
     if (this.query !== undefined) return this.query.manager.getRepository(entity)
     return getRepository(entity)
+  }
+
+  getMongoRepository<Entity extends ObjectLiteral> (entity: ObjectType<Entity>): MongoRepository<Entity> {
+    if (this.connection === undefined) throw new ConnectionNotFoundError()
+    if (this.query !== undefined) return this.query.manager.getMongoRepository(entity)
+    return getMongoRepository(entity)
   }
 }

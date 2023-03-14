@@ -6,29 +6,30 @@ type Setup = (
   universityRepo: DBPopulateUniversity
 ) => PopulateUniversity
 type Input = { 
-  entryPoint: string,
   countryList: string[]
 }
 type Output = void
 
 export type PopulateUniversity = (input: Input) => Promise<Output>
 
-export const setupPopulateUniversity: Setup = (httpClient, universityRepo) => async ({entryPoint, countryList}) => {
-  const promises = countryList.map(country => httpClient.get(
-      {
-        url: entryPoint, 
+export const setupPopulateUniversity: Setup = (httpClient, universityRepo) => async ({countryList}) => {
+  const promises = countryList.map(country => { 
+    return httpClient.get({ 
+        url: "search",
         params: {
           country
         }
-      }
-    )
+      })
+    }
   )
   
   const results = await Promise.all(promises)
 
-  const universityList = results.map(({ body }) => {
-    return body
+  const bodyList = results.map(({ body }) => {
+    return body.map((university: any) => university)
   }) 
+
+  const universityList = bodyList.flat()
 
   await universityRepo.populate(universityList)
 }
